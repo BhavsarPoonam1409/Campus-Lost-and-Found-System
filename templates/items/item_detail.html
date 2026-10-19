@@ -1,0 +1,115 @@
+
+{% extends 'items/base.html' %}
+
+{% block title %}{{ item.item_name }} | CampusFind{% endblock %}
+
+{% block content %}
+
+<section class="detail-page">
+    <div class="container">
+
+        <a href="{% if item.report_type == 'Lost' %}{% url 'lost_items' %}{% else %}{% url 'found_items' %}{% endif %}" class="back-link">
+            ← Back to {{ item.report_type }} Items
+        </a>
+
+        <div class="detail-card">
+
+            <div class="detail-header">
+                <div class="detail-icon">
+                    {% if item.report_type == 'Lost' %}🔎{% else %}🎒{% endif %}
+                </div>
+
+                <div class="detail-title">
+                    <div class="item-card-top">
+                        <span class="badge {% if item.report_type == 'Lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.report_type }}
+                        </span>
+
+                        <span class="status-badge status-{{ item.status|lower }}">
+                            {{ item.status }}
+                        </span>
+                    </div>
+
+                    <h1>{{ item.item_name }}</h1>
+                    <p>{{ item.category }}</p>
+                </div>
+            </div>
+
+            <div class="detail-description">
+                <h3>Description</h3>
+                <p>{{ item.description|linebreaksbr }}</p>
+            </div>
+
+            <div class="detail-info-grid">
+                <div class="detail-info">
+                    <span>📍 Location</span>
+                    <strong>{{ item.location }}</strong>
+                </div>
+
+                <div class="detail-info">
+                    <span>📅 Date {{ item.report_type }}</span>
+                    <strong>{{ item.item_date|date:"d F Y" }}</strong>
+                </div>
+
+                <div class="detail-info">
+                    <span>👤 Reported By</span>
+                    <strong>{{ item.reported_by.username }}</strong>
+                </div>
+
+                <div class="detail-info">
+                    <span>📞 Contact Details</span>
+                    <strong>{{ item.contact_details }}</strong>
+                </div>
+
+                <div class="detail-info">
+                    <span>🕒 Report Created</span>
+                    <strong>{{ item.created_at|date:"d M Y, h:i A" }}</strong>
+                </div>
+            </div>
+
+            {% if user.is_authenticated and user == item.reported_by %}
+                <div class="owner-actions">
+                    <h3>Manage Your Report</h3>
+
+                    <div class="action-buttons">
+                        <a href="{% url 'edit_item' item.pk %}" class="btn btn-outline">
+                            ✏️ Edit Report
+                        </a>
+
+                        <a href="{% url 'delete_item' item.pk %}" class="btn btn-danger">
+                            🗑️ Delete Report
+                        </a>
+                    </div>
+
+                    {% if item.status != 'Returned' %}
+                        <form method="post" action="{% url 'update_status' item.pk %}" class="status-form">
+                            {% csrf_token %}
+
+                            <label for="status">Update Item Status</label>
+
+                            <select name="status" id="status" required>
+                                {% if item.status == 'Lost' %}
+                                    <option value="Found">Found</option>
+                                    <option value="Returned">Returned</option>
+                                {% elif item.status == 'Found' %}
+                                    <option value="Returned">Returned</option>
+                                {% endif %}
+                            </select>
+
+                            <button type="submit" class="btn btn-primary">
+                                Update Status
+                            </button>
+                        </form>
+                    {% else %}
+                        <p class="success-note">
+                            ✓ This item has been marked as Returned.
+                        </p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

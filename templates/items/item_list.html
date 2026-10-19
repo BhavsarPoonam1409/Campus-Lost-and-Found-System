@@ -1,0 +1,140 @@
+
+{% extends 'items/base.html' %}
+
+{% block title %}{{ report_type }} Items | CampusFind{% endblock %}
+
+{% block content %}
+
+<section class="list-page">
+    <div class="container">
+
+        <div class="list-hero {% if report_type == 'Lost' %}list-lost{% else %}list-found{% endif %}">
+            <div>
+                <span class="eyebrow">CAMPUS COMMUNITY</span>
+
+                <h1>
+                    {% if report_type == 'Lost' %}
+                        🔎 Lost Items
+                    {% else %}
+                        🎒 Found Items
+                    {% endif %}
+                </h1>
+
+                <p>
+                    {% if report_type == 'Lost' %}
+                        Help fellow students recover their missing belongings.
+                    {% else %}
+                        Find the owners of belongings discovered on campus.
+                    {% endif %}
+                </p>
+            </div>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'report_item' report_type %}" class="btn btn-primary">
+                    + Report {{ report_type }} Item
+                </a>
+            {% endif %}
+        </div>
+
+        <form method="get" class="search-form">
+            <span class="search-icon">🔎</span>
+
+            <input
+                type="search"
+                name="q"
+                value="{{ query }}"
+                placeholder="Search by item name or category..."
+            >
+
+            <button type="submit" class="btn btn-primary">
+                Search
+            </button>
+
+            {% if query %}
+                <a href="{% if report_type == 'Lost' %}{% url 'lost_items' %}{% else %}{% url 'found_items' %}{% endif %}" class="btn btn-outline">
+                    Clear
+                </a>
+            {% endif %}
+        </form>
+
+        <div class="results-heading">
+            <h2>
+                {% if query %}
+                    Search Results
+                {% else %}
+                    All {{ report_type }} Reports
+                {% endif %}
+            </h2>
+
+            <span>{{ items|length }} item(s)</span>
+        </div>
+
+        <div class="item-grid">
+            {% for item in items %}
+                <article class="item-card">
+                    <div class="item-card-top">
+                        <span class="badge {% if item.report_type == 'Lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.report_type }}
+                        </span>
+
+                        <span class="category-label">
+                            {{ item.category }}
+                        </span>
+                    </div>
+
+                    <h3>
+                        <a href="{% url 'item_detail' item.pk %}">
+                            {{ item.item_name }}
+                        </a>
+                    </h3>
+
+                    <p class="item-description">
+                        {{ item.description|truncatewords:20 }}
+                    </p>
+
+                    <div class="item-meta">
+                        <span>📍 {{ item.location }}</span>
+                        <span>📅 {{ item.item_date|date:"d M Y" }}</span>
+                    </div>
+
+                    <div class="status-row">
+                        <span class="status-badge status-{{ item.status|lower }}">
+                            {{ item.status }}
+                        </span>
+                    </div>
+
+                    <p class="reported-by">
+                        Reported by
+                        <strong>{{ item.reported_by.username }}</strong>
+                    </p>
+
+                    <a href="{% url 'item_detail' item.pk %}" class="card-link">
+                        View Details →
+                    </a>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <span>🔍</span>
+                    <h3>No items found</h3>
+                    <p>
+                        {% if query %}
+                            Try a different item name or category.
+                        {% else %}
+                            There are no reports in this list yet.
+                        {% endif %}
+                    </p>
+
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'report_item' report_type %}" class="btn btn-primary">
+                            Create a Report
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+

@@ -1,0 +1,45 @@
+
+{% extends 'items/base.html' %}
+
+{% block title %}Delete Report | CampusFind{% endblock %}
+
+{% block content %}
+
+<section class="auth-section">
+    <div class="auth-card delete-card">
+
+        <div class="auth-icon">⚠️</div>
+
+        <span class="eyebrow">CONFIRM ACTION</span>
+        <h1>Delete This Report?</h1>
+
+        <p class="auth-subtitle">
+            Are you sure you want to delete
+            <strong>{{ item.item_name }}</strong>?
+            This action cannot be undone.
+        </p>
+
+        <div class="delete-summary">
+            <p><strong>Item:</strong> {{ item.item_name }}</p>
+            <p><strong>Type:</strong> {{ item.report_type }}</p>
+            <p><strong>Status:</strong> {{ item.status }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-actions">
+                <a href="{% url 'item_detail' item.pk %}" class="btn btn-outline">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn btn-danger">
+                    Yes, Delete
+                </button>
+            </div>
+        </form>
+
+    </div>
+</section>
+
+{% endblock %}

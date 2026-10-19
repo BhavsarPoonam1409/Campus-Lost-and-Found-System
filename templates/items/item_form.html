@@ -1,0 +1,89 @@
+
+{% extends 'items/base.html' %}
+
+{% block title %}{{ page_title }} | CampusFind{% endblock %}
+
+{% block content %}
+
+<section class="form-page">
+    <div class="form-page-heading">
+        <span class="eyebrow">CAMPUS LOST & FOUND</span>
+        <h1>{{ page_title }}</h1>
+        <p>
+            Provide accurate details so the campus community can help.
+        </p>
+    </div>
+
+    <div class="report-form-card">
+        <div class="report-form-banner {% if report_type == 'Lost' %}lost-banner{% else %}found-banner{% endif %}">
+            <span class="report-banner-icon">
+                {% if report_type == 'Lost' %}🔎{% else %}🎒{% endif %}
+            </span>
+
+            <div>
+                <h3>
+                    {% if report_type == 'Lost' %}
+                        Tell us what you've lost
+                    {% elif report_type == 'Found' %}
+                        Tell us what you've found
+                    {% else %}
+                        Update your report
+                    {% endif %}
+                </h3>
+
+                <p>
+                    {% if report_type == 'Lost' %}
+                        Every detail can help you recover your belongings.
+                    {% elif report_type == 'Found' %}
+                        Help the rightful owner identify their belongings.
+                    {% else %}
+                        Keep the information accurate and up to date.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <form method="post" class="styled-form report-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        <span class="required">*</span>
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <div class="help-text">
+                            {{ field.help_text|safe }}
+                        </div>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div class="field-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="form-actions">
+                <a href="{% url 'home' %}" class="btn btn-outline">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    {% if item %}Save Changes{% else %}Submit Report{% endif %} →
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

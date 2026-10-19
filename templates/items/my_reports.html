@@ -1,0 +1,95 @@
+
+{% extends 'items/base.html' %}
+
+{% block title %}My Reports | CampusFind{% endblock %}
+
+{% block content %}
+
+<section class="list-page">
+    <div class="container">
+
+        <div class="list-hero">
+            <div>
+                <span class="eyebrow">YOUR ACTIVITY</span>
+                <h1>My Reports</h1>
+                <p>Manage the lost and found reports you have created.</p>
+            </div>
+
+            <a href="{% url 'home' %}" class="btn btn-outline">
+                ← Back Home
+            </a>
+        </div>
+
+        <div class="results-heading">
+            <h2>Your Submitted Reports</h2>
+            <span>{{ items|length }} report(s)</span>
+        </div>
+
+        <div class="item-grid">
+            {% for item in items %}
+                <article class="item-card">
+
+                    <div class="item-card-top">
+                        <span class="badge {% if item.report_type == 'Lost' %}badge-lost{% else %}badge-found{% endif %}">
+                            {{ item.report_type }}
+                        </span>
+
+                        <span class="status-badge status-{{ item.status|lower }}">
+                            {{ item.status }}
+                        </span>
+                    </div>
+
+                    <h3>
+                        <a href="{% url 'item_detail' item.pk %}">
+                            {{ item.item_name }}
+                        </a>
+                    </h3>
+
+                    <p class="item-description">
+                        {{ item.description|truncatewords:18 }}
+                    </p>
+
+                    <div class="item-meta">
+                        <span>📍 {{ item.location }}</span>
+                        <span>📅 {{ item.item_date|date:"d M Y" }}</span>
+                    </div>
+
+                    <div class="action-buttons card-actions">
+                        <a href="{% url 'item_detail' item.pk %}" class="btn btn-primary btn-small">
+                            View
+                        </a>
+
+                        <a href="{% url 'edit_item' item.pk %}" class="btn btn-outline btn-small">
+                            Edit
+                        </a>
+
+                        <a href="{% url 'delete_item' item.pk %}" class="btn btn-danger btn-small">
+                            Delete
+                        </a>
+                    </div>
+
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <span>📝</span>
+                    <h3>You haven't submitted any reports</h3>
+                    <p>Start by reporting a lost or found item.</p>
+
+                    <div class="action-buttons">
+                        <a href="{% url 'report_item' 'Lost' %}" class="btn btn-primary">
+                            Report Lost
+                        </a>
+
+                        <a href="{% url 'report_item' 'Found' %}" class="btn btn-outline">
+                            Report Found
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
